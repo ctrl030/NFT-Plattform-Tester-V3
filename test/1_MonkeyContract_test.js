@@ -8,6 +8,7 @@ describe("Monkey Contract, testing", () => {
 
   // 11 genes0
   const genes0 = [
+    1214131177989271,
     1214131111989211,
     2821812836412724,
     8637321863927066,
@@ -30,7 +31,7 @@ describe("Monkey Contract, testing", () => {
     accounts = await ethers.getSigners();
   })
 
-  it("1: create 11 additional gen 0 monkeys (constructor created first one), then expect revert above 12 (after GEN0_Limit = 12)", async () => {
+  it("1: create 12 gen 0 monkeys, then expect revert above 12 (after GEN0_Limit = 12)", async () => {
     
     // REVERT: create a gen 0 monkey from account[1]
     await expect(monkeyContract.connect(accounts[1]).createGen0Monkey(genes0[0])).to.be.revertedWith(
@@ -54,7 +55,7 @@ describe("Monkey Contract, testing", () => {
       //console.log("_monkeyMapping[3]", ethers.utils.formatUnits(_monkeyMapping[3], 0), "loop", i)
       // _monkeyMapping[3] shows genes  attribute inside the returning CryptoMonkey object
       // i-1 because first Crypto Monkey was done by constructor, not from genes0
-      expect(_monkeyMapping[3]).to.equal(genes0[i-1]);
+      expect(_monkeyMapping[3]).to.equal(genes0[i]);
       }
     } 
 
@@ -69,7 +70,7 @@ describe("Monkey Contract, testing", () => {
     // breeding monkey from mapping results
     await monkeyContract.breed(1, 2);
     // balanceOf accounts[0] should be 12
-    expect(await monkeyContract.balanceOf(accounts[0].address)).to.equal(12);
+    expect(await monkeyContract.balanceOf(accounts[0].address)).to.equal(13);
     // NFT totalSupply should be 13
     expect(await monkeyContract.totalSupply()).to.equal(13);
   });
@@ -80,15 +81,21 @@ describe("Monkey Contract, testing", () => {
       let _result = ethers.utils.formatUnits(_monkeyId[i], 0);
       console.log("tokenArray", _result);
     }
-    let _monkeyPosition = await monkeyContract.findNFTposition(accounts[0].address, _monkeyId[1]);
-    console.log("monkey Position", ethers.utils.formatUnits(_monkeyPosition, 0))
+    //let _monkeyPosition = await monkeyContract.findNFTposition(accounts[0].address, _monkeyId[1]);
+    //console.log("monkey Position", ethers.utils.formatUnits(_monkeyPosition, 0))
   });
 
   it("4. TRANSFER 2 gen0 monkeys from account[0] to account[1]", async () => {
+    // xxxx correct numbers 
+
     const _totalSupply = await monkeyContract.totalSupply();
     console.log(`total#[${_totalSupply}]`)
     await monkeyContract.transferFrom(accounts[0].address, accounts[1].address, 2);
     expect(await monkeyContract.balanceOf(accounts[1].address)).to.equal(1);
+
+    await monkeyContract.transferFrom(accounts[0].address, accounts[1].address, 3);
+    expect(await monkeyContract.balanceOf(accounts[1].address)).to.equal(2);
+
     // REVERT: transfer a non-owned monkey
     await expect(monkeyContract.transferFrom(accounts[1].address, accounts[2].address, 1)).to.be.revertedWith(
       "ERC721: transfer of token that is not own"

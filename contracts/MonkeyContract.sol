@@ -35,22 +35,9 @@ contract MonkeyContract is ERC721, Ownable, ReentrancyGuard, Pausable {
         uint256 generation;
         uint256 genes;
         uint256 birthtime;
-    }
-
-    // MAPPINGS      
-
-    // maps owner to an array that holds all their tokenIds    
-    // tokenId positions are saved in this mapping: monkeyIdPositionsMapping , (see below) 
-    // can be queried by findMonkeyIdsOfAddress function
-    mapping(address => uint256[]) public ownersToTokenIdArrayMapping;
-
-    // used to keep track of owners and their crypto monkey NFTs 
-    // owner to tokenid to position of the NFT in this array: ownersToTokenIdArrayMapping , (see above)
-    // can  be queried by findNFTposition function
-    mapping(address => mapping(uint256 => uint256)) public monkeyIdPositionsMapping;
+    }    
 
     // ARRAYS
-
     // This is an array that holds all CryptoMonkeys. 
     // Their position in that array IS their tokenId.
     // they never get deleted here, array only grows and keeps track of them all.
@@ -87,10 +74,10 @@ contract MonkeyContract is ERC721, Ownable, ReentrancyGuard, Pausable {
         
         // minting a placeholder Zero Monkey, that occupies the index 0 position
         //_createMonkey(0, 0, 0, 1214131177989271, _monkeyContractAddress);  
-        createGen0Monkey(1214131177989271);
+        //createGen0Monkey(1214131177989271);
 
         // burning Zero Monkey NFT, index 0 can now be treated as "none"      
-        burnNFT(0); 
+        //burnNFT(0); 
     }
 
     // Functions 
@@ -206,15 +193,24 @@ contract MonkeyContract is ERC721, Ownable, ReentrancyGuard, Pausable {
 
     // gives back an array with the NFT tokenIds that the provided sender address owns
     // deleted NFTs are kept as entries with value 0 (token ID 0 is used by Zero Monkey)
-    function findMonkeyIdsOfAddress(address sender) public view returns (uint256[] memory) {  
-        return ownersToTokenIdArrayMapping[sender];
-    }
+    function findMonkeyIdsOfAddress(address owner) public view returns (uint256[] memory) {
 
-    // gives back the position of a certain NFT in their owner's array ownersToTokenIdArrayMapping    
-    function findNFTposition(address owner, uint256 tokenId ) public view returns (uint256) {  
-        return monkeyIdPositionsMapping[owner][tokenId];
-    }
+        uint256 amountOwned = balanceOf(owner);
 
+        uint256 entryCounter = 0;
+
+        uint256[] memory ownedTokenIDs = new uint256[](amountOwned);
+
+        for (uint256 tokenIDtoCheck = 0; tokenIDtoCheck < totalSupply; tokenIDtoCheck++ ) {
+            
+            if (ERC721.ownerOf(tokenIDtoCheck) == owner) {
+                ownedTokenIDs[entryCounter] = tokenIDtoCheck; 
+                entryCounter++;
+            }       
+        }
+
+        return ownedTokenIDs;        
+    }
 
     // used for creating gen0 monkeys 
     function createGen0Monkey(uint256 _genes) public onlyOwner {
@@ -255,13 +251,8 @@ contract MonkeyContract is ERC721, Ownable, ReentrancyGuard, Pausable {
 
         // after creation, transferring to new owner, 
         // transferring address is user, sender is 0 address
-        _safeMint(_owner, newMonkeyId);        
-        
-        // we set the position in the array
-        monkeyIdPositionsMapping[_owner][newMonkeyId] = newMonkeyId;
-        // add to the array of tokenIds
-        ownersToTokenIdArrayMapping[_owner].push(newMonkeyId);
-        // emitting before the action
+        _safeMint(_owner, newMonkeyId);    
+
         emit MonkeyCreated(_owner, newMonkeyId, _parent1Id, _parent2Id, _genes);
 
         // tokenId is returned
@@ -322,27 +313,16 @@ contract MonkeyContract is ERC721, Ownable, ReentrancyGuard, Pausable {
     ) public nonReentrant whenNotPaused{
         require(_to != address(0), "transfer to the zero address");
         require(_to != address(this), "Can't transfer to");
-        
-        delete monkeyIdPositionsMapping[_from][_tokenId];
-
-        monkeyIdPositionsMapping[_to][_tokenId] = _tokenId;
+        require (ERC721._isApprovedOrOwner(msg.sender, _tokenId) == true);   
 
         safeTransferFrom(_from, _to, _tokenId);
     }
 
     function burnNFT (        
         uint256 _tokenId
-    ) private nonReentrant whenNotPaused{
-
-        address owner = ownerOf(_tokenId);
+    ) private nonReentrant whenNotPaused{       
         
-        require (ERC721._isApprovedOrOwner(msg.sender, _tokenId) == true); 
-
-        // deletes the tokenId from the old owner's mapping, at the correct position
-        delete ownersToTokenIdArrayMapping[owner][monkeyIdPositionsMapping[owner][_tokenId]];
-
-        // deletes the saved position of the NFT in their mapping
-        delete monkeyIdPositionsMapping[owner][_tokenId]; 
+        require (ERC721._isApprovedOrOwner(msg.sender, _tokenId) == true);         
 
         // burning via openzeppelin
         _burn(_tokenId);       
