@@ -88,8 +88,8 @@ contract MonkeyContract is ERC721, Ownable, ReentrancyGuard, Pausable {
 
     function breed(uint256 _parent1Id, uint256 _parent2Id) public whenNotPaused returns (uint256)  {
 
-        // msg.sender needs to be owner of both crypto monkeys
-        require(ownerOf(_parent1Id) == msg.sender && ownerOf(_parent2Id) == msg.sender, "must be owner of both parent tokens");
+        // _msgSender() needs to be owner of both crypto monkeys
+        require(ownerOf(_parent1Id) == _msgSender() && ownerOf(_parent2Id) == _msgSender(), "must be owner of both parent tokens");
 
         // first 8 digits in DNA will be selected by dividing, solidity will round down everything to full integers
         uint256 _parent1genes = allMonkeysArray[_parent1Id].genes; 
@@ -104,7 +104,7 @@ contract MonkeyContract is ERC721, Ownable, ReentrancyGuard, Pausable {
         uint256 _newGeneration = _calcGeneration(_parent1Id, _parent2Id);
 
         // creating new monkey
-        uint256 newMonkeyId = _createMonkey(_parent1Id, _parent2Id, _newGeneration, _newDna, msg.sender);                       
+        uint256 newMonkeyId = _createMonkey(_parent1Id, _parent2Id, _newGeneration, _newDna, _msgSender());                       
 
         emit BreedingSuccessful(
             newMonkeyId,
@@ -113,7 +113,7 @@ contract MonkeyContract is ERC721, Ownable, ReentrancyGuard, Pausable {
             allMonkeysArray[newMonkeyId].parent1Id,
             allMonkeysArray[newMonkeyId].parent2Id,
             allMonkeysArray[newMonkeyId].generation,
-            msg.sender
+            _msgSender()
         );       
 
         return newMonkeyId;
@@ -203,7 +203,7 @@ contract MonkeyContract is ERC721, Ownable, ReentrancyGuard, Pausable {
 
         for (uint256 tokenIDtoCheck = 0; tokenIDtoCheck < totalSupply; tokenIDtoCheck++ ) {
             
-            if (ERC721.ownerOf(tokenIDtoCheck) == owner) {
+            if (ownerOf(tokenIDtoCheck) == owner) {
                 ownedTokenIDs[entryCounter] = tokenIDtoCheck; 
                 entryCounter++;
             }       
@@ -221,7 +221,7 @@ contract MonkeyContract is ERC721, Ownable, ReentrancyGuard, Pausable {
         gen0amountTotal++;
 
         // creating
-        _createMonkey(0, 0, 0, _genes, msg.sender);
+        _createMonkey(0, 0, 0, _genes, _msgSender());
         
     }
 
@@ -301,7 +301,7 @@ contract MonkeyContract is ERC721, Ownable, ReentrancyGuard, Pausable {
     }
 
     /// * @dev Assign ownership of a specific Monekey to an address.
-    /// * @dev This poses no restriction on msg.sender
+    /// * @dev This poses no restriction on _msgSender()
     /// * @param _from The address from who to transfer from, can be 0 for creation of a monkey
     /// * @param _to The address to who to transfer to, cannot be 0 address
     /// * @param _tokenId The id of the transfering monkey
@@ -313,7 +313,7 @@ contract MonkeyContract is ERC721, Ownable, ReentrancyGuard, Pausable {
     ) public nonReentrant whenNotPaused{
         require(_to != address(0), "transfer to the zero address");
         require(_to != address(this), "Can't transfer to");
-        require (ERC721._isApprovedOrOwner(msg.sender, _tokenId) == true);   
+        require (_isApprovedOrOwner(_msgSender(), _tokenId) == true);   
 
         safeTransferFrom(_from, _to, _tokenId);
     }
@@ -322,7 +322,7 @@ contract MonkeyContract is ERC721, Ownable, ReentrancyGuard, Pausable {
         uint256 _tokenId
     ) private nonReentrant whenNotPaused{       
         
-        require (ERC721._isApprovedOrOwner(msg.sender, _tokenId) == true);         
+        require (_isApprovedOrOwner(_msgSender(), _tokenId) == true);         
 
         // burning via openzeppelin
         _burn(_tokenId);       
