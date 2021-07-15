@@ -8,6 +8,7 @@ describe("Monkey Contract, testing", () => {
 
   // 11 genes0
   const genes0 = [
+    1000000000000000,
     1111111111111111,
     2222222222222222,
     3333333333333333,
@@ -18,8 +19,7 @@ describe("Monkey Contract, testing", () => {
     1214131177989271,
     4778887573779531,
     2578926622376651,
-    5867697316113337,
-    4688246721977031    
+    5867697316113337        
   ] 
 
   //set contracts instances
@@ -99,7 +99,7 @@ describe("Monkey Contract, testing", () => {
 
   });
 
-  it("2. BREED Monkey", async () => {
+  it("Test 3: BREED Monkey", async () => {
     // breeding 3 NFT monkeys
     const breed1answer = await monkeyContract.breed(1, 2); // tokenId 12
     const breed2answer = await monkeyContract.breed(3, 4); // tokenId 13
@@ -110,15 +110,15 @@ describe("Monkey Contract, testing", () => {
 
     const NFTwTokenID12 = await monkeyContract.getMonkeyDetails(12);
     let result12 = ethers.utils.formatUnits(NFTwTokenID12.genes, 0);
-    console.log('NFTwTokenID12 genes:', result12);
+    //console.log('NFTwTokenID12 genes:', result12);
 
     const NFTwTokenID13 = await monkeyContract.getMonkeyDetails(13);
     let result13 = ethers.utils.formatUnits(NFTwTokenID13.genes, 0);
-    console.log('NFTwTokenID13 genes:', result13);
+    //console.log('NFTwTokenID13 genes:', result13);
 
     const NFTwTokenID14 = await monkeyContract.getMonkeyDetails(14);
     let result14 = ethers.utils.formatUnits(NFTwTokenID14.genes, 0);
-    console.log('NFTwTokenID14 genes:', result14);
+    //console.log('NFTwTokenID14 genes:', result14);
 
     /*
     const NFTwTokenID13 = monkeyContract.getMonkeyDetails(13);
@@ -136,20 +136,18 @@ describe("Monkey Contract, testing", () => {
     expect(await monkeyContract.totalSupply()).to.equal(15);
   });
 
-  it("3. Checking tokenId ", async () =>{
+  it("Test 4: Checking tokenId ", async () =>{
     let _monkeyId = await monkeyContract.findMonkeyIdsOfAddress(accounts[0].address);
     for(i in _monkeyId){
       let _result = ethers.utils.formatUnits(_monkeyId[i], 0);
-      console.log("tokenArray", _result);
-    }
-    //let _monkeyPosition = await monkeyContract.findNFTposition(accounts[0].address, _monkeyId[1]);
-    //console.log("monkey Position", ethers.utils.formatUnits(_monkeyPosition, 0))
+      //console.log("Token IDs of accounts[0]", _result);
+    }    
   });
 
   it("4. TRANSFER 2 gen0 monkeys from account[0] to account[1]", async () => {    
 
     const _totalSupply = await monkeyContract.totalSupply();
-    console.log(`total#[${_totalSupply}]`)
+    //console.log(`total#[${_totalSupply}]`)
 
     await monkeyContract.transferFrom(accounts[0].address, accounts[1].address, 2);
     expect(await monkeyContract.balanceOf(accounts[1].address)).to.equal(1);
@@ -157,13 +155,27 @@ describe("Monkey Contract, testing", () => {
     await monkeyContract.transferFrom(accounts[0].address, accounts[1].address, 3);
     expect(await monkeyContract.balanceOf(accounts[1].address)).to.equal(2);
 
+    let _monkeyId = await monkeyContract.findMonkeyIdsOfAddress(accounts[1].address);
+    for(i in _monkeyId){
+      let _result = ethers.utils.formatUnits(_monkeyId[i], 0);
+      //console.log("Token IDs of accounts[1], should be 2 and 3: ", _result);
+    }
+
+    let _monkeyId1 = await monkeyContract.findMonkeyIdsOfAddress(accounts[0].address);
+    for(k in _monkeyId1){
+      let _result1 = ethers.utils.formatUnits(_monkeyId1[k], 0);
+      //console.log("Token IDs of accounts[0], should be 0-14, without 2 and 3: ", _result1);
+    }
+
+    // accounts[0] should own 13 monkeys
+    expect(await monkeyContract.balanceOf(accounts[0].address)).to.equal(13);
+
     // REVERT: transfer a non-owned monkey
     await expect(monkeyContract.transferFrom(accounts[1].address, accounts[2].address, 1)).to.be.revertedWith(
       "ERC721: transfer of token that is not own"
     );
     
-    // accounts[0] should own 13 monkeys
-    expect(await monkeyContract.balanceOf(accounts[0].address)).to.equal(13);
+    
   });
 
   /*
@@ -173,76 +185,8 @@ describe("Monkey Contract, testing", () => {
 describe('Testing main contract: NFT creation and transfers', () => {      
 
   
-  it('Test 8: accounts[0] should create 9 gen0 monkeys with DNA matching their index/tokenId', async() => {  
-       
-    // this loop will create 9 gen0 NFTs, each with a DNA string consisting of repeated, concatted NFT tokenId
-    // i.e. 1111111111111111 for the NFT with tokenId 1
-    // it will also check the emitted MonkeyCreated event each time and check if the emitted DNA string is correct as well
-    for (let i = 1; i < 10; i++) {
-      
-      const concattedIndexes = `${i}${i}${i}${i}${i}${i}${i}${i}${i}${i}${i}${i}${i}${i}${i}${i}` 
-      
-      
-      const receipt = await monkeyContractHHInstance.createGen0Monkey(concattedIndexes, {from: accounts[0]});        
-      expectEvent(receipt, 'MonkeyCreated', { genes: `${concattedIndexes}` });        
-      
-      const genesTestedDetails = await monkeyContractHHInstance.getMonkeyDetails(i);
-      const genesTested = parseInt(genesTestedDetails.genes);
-      const compareConcats = parseInt(concattedIndexes); 
-      assert.equal(genesTested, compareConcats);
-      assertionCounter++;       
-      
-      // checking how many NFTs are owned by accounts[0] after each loop
-      const prepAmountNFTsForAccounts0 = await monkeyContractHHInstance.balanceOf(accounts[0]);
-      const amountNFTsForAccounts0 = parseInt(prepAmountNFTsForAccounts0) ;        
-      assert.equal(amountNFTsForAccounts0, i);
-      assertionCounter++;
-    }
-
-    // checking total supply of NFTs, should be 10, one Zero Monkey plus 9 gen0
-    const totalSupplyAfterCreating10 = await monkeyContractHHInstance.totalSupply();      
-    assert.equal(totalSupplyAfterCreating10, 10);
-    assertionCounter++;      
-    
-    const account0ArrayToAssert = [1, 2, 3, 4, 5, 6, 7, 8, 9 ];
-    await assertAllFourTrackersCorrect (accounts[0], 9,  account0ArrayToAssert);
-
-  });
-
   
-  it('Test 9: accounts[0] should create 2 additional gen0 monkeys, bringing totalSupply to 12, of which 11 gen0', async() => { 
 
-    // this loop will create 2 gen0 NFTs, each with a DNA string of 1111111111111111
-    // it will also check the emitted MonkeyCreated event each time and check if the emitted DNA string is correct as well
-    for (let i = 0; i < 2; i++) {              
-      const receipt2 =  await monkeyContractHHInstance.createGen0Monkey(1111111111111111, {from: accounts[0]});  
-      
-      // checking if genes string is as expected in NFTs with Token ID 10 and 11
-      const correctTokenID = i + 10
-      const genesTestedDetails = await monkeyContractHHInstance.getMonkeyDetails(correctTokenID);
-      const genesTested = parseInt(genesTestedDetails.genes); 
-      const correctGenes = parseInt(1111111111111111)
-      assert.equal(genesTested, correctGenes);
-      assertionCounter++;        
-
-      // checking if MonkeyCreated event was correctly triggered
-      expectEvent(receipt2, 'MonkeyCreated', { genes: `${correctGenes}` }); 
-      
-      // checking how many NFTs are owned by accounts[0] after each loop
-      const prepAmountNFTsForAccounts0 = await monkeyContractHHInstance.balanceOf(accounts[0]);
-      const amountNFTsForAccounts0 = parseInt(prepAmountNFTsForAccounts0) ;
-      //console.log(amountNFTsForAccounts0);
-      assert.equal(amountNFTsForAccounts0, correctTokenID)
-      assertionCounter++;
-    }
-    const totalSupplyAfterCreating12 = await monkeyContractHHInstance.totalSupply();      
-    assert.equal(parseInt(totalSupplyAfterCreating12), 12); 
-    assertionCounter++;       
-    
-    const account0ArrayToAssert = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ];
-    await assertAllFourTrackersCorrect (accounts[0], 11,  account0ArrayToAssert);
-
-  });
   
   it('Test 10: accounts[1] should try to create NFT, but is not authorized, should fail', async() => {             
       

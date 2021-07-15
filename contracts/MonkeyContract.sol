@@ -11,6 +11,8 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 // importing openzeppelin script to make contract pausable
 import "@openzeppelin/contracts/security/Pausable.sol";
+// importing hardhat console.log functionality
+import "hardhat/console.sol";
 
 contract MonkeyContract is ERC721, Ownable, ReentrancyGuard, Pausable {
 
@@ -150,8 +152,11 @@ contract MonkeyContract is ERC721, Ownable, ReentrancyGuard, Pausable {
     // will generate a pseudo random number and from that decide whether to take mom or dad genes, repeated for 8 pairs of 2 digits each
     function _mixDna (uint256 _parent1genes, uint256 _parent2genes) internal view returns (uint256) {
         uint256[8] memory _geneArray;
-        uint8 _random = _getRandom();
-        uint8 index = 7;
+        uint8 _random = uint8(_getRandom());
+        uint256 index = 7;
+
+         // xxxx
+        console.log("_parent1genes: %s , _parent2genes: %s , _random: %s ", _parent1genes, _parent2genes, _random);
 
         // Bitshift: move to next binary bit
         for (uint256 i = 1; i <= 128; i = i * 2) {
@@ -164,29 +169,49 @@ contract MonkeyContract is ERC721, Ownable, ReentrancyGuard, Pausable {
         //each loop, take off the last 2 digits from the genes number string
         _parent1genes = _parent1genes / 100;
         _parent2genes = _parent2genes / 100;
-        index = index--;
+
+        index = index -1;
         }
 
-        uint256 pseudoRandomAdv = uint256(keccak256(abi.encodePacked(uint256(_random), totalSupply, allMonkeysArray[0].genes)));         
+        uint256 pseudoRandomAdv = 200; //uint256(keccak256(abi.encodePacked(uint256(_random), totalSupply, allMonkeysArray[0].genes))); 
+        
+        // xxxx
+        console.log("pseudoRandomAdv: %s ", pseudoRandomAdv);
+         
 
         // makes this number a 2 digit number between 10-98
         pseudoRandomAdv = (pseudoRandomAdv % 89) + 10;
 
+         // xxxx
+        console.log("pseudoRandomAdv after shortening: %s ", pseudoRandomAdv);
+
         // setting first 2 digits in DNA string to random numbers
         _geneArray[0] = pseudoRandomAdv;
 
-        uint256 newGeneSequence; 
+        uint256 newGeneSequence;
+
+        // xxxx
+        console.log("newGeneSequence at beginning: %s ", newGeneSequence);
         
         // puts in last positioned array entry (2 digits) as first numbers, then adds 00, then adds again,
         // therefore reversing the backwards information in the array again to correct order 
         for (uint256 j = 0; j < 8; j++) {
             newGeneSequence = newGeneSequence + _geneArray[j];
 
+            // xxxx
+            console.log("newGeneSequence being modified: %s ", newGeneSequence);
+
             // will stop adding zeros after last repetition
             if (j != 7)  {
                 newGeneSequence = newGeneSequence * 100;
+
+                // xxxx
+                console.log("newGeneSequence inner loop: %s ", newGeneSequence);
             }                
-        } 
+        }
+
+        // xxxx
+        console.log("newGeneSequence at end: %s ", newGeneSequence); 
 
         return newGeneSequence;      
     }
@@ -241,7 +266,6 @@ contract MonkeyContract is ERC721, Ownable, ReentrancyGuard, Pausable {
             genes: _genes,
             birthtime: uint256(block.timestamp)
         });
-
         // updating total supply
         totalSupply++;
         
@@ -254,6 +278,9 @@ contract MonkeyContract is ERC721, Ownable, ReentrancyGuard, Pausable {
         _safeMint(_owner, newMonkeyId);    
 
         emit MonkeyCreated(_owner, newMonkeyId, _parent1Id, _parent2Id, _genes);
+
+        // xxxx
+        console.log("Token ID %s has genes: %s", newMonkeyId, _genes);
 
         // tokenId is returned
         return newMonkeyId;
