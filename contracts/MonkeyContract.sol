@@ -167,7 +167,7 @@ contract MonkeyContract is ERC721, Ownable, ReentrancyGuard, Pausable {
         index = index--;
         }
 
-        uint256 pseudoRandomAdv = uint256(keccak256(abi.encodePacked(uint256(_random), totalSupply, allMonkeysArray[allMonkeysArray.length-1].genes)));         
+        uint256 pseudoRandomAdv = uint256(keccak256(abi.encodePacked(uint256(_random), totalSupply, allMonkeysArray[0].genes)));         
 
         // makes this number a 2 digit number between 10-98
         pseudoRandomAdv = (pseudoRandomAdv % 89) + 10;

@@ -102,8 +102,8 @@ describe("Monkey Contract, testing", () => {
   it("2. BREED Monkey", async () => {
     // breeding 3 NFT monkeys
     const breed1answer = await monkeyContract.breed(1, 2); // tokenId 12
-    const breed2answer =await monkeyContract.breed(3, 4); // tokenId 13
-    const breed3answer =await monkeyContract.breed(5, 6); // tokenId 14
+    const breed2answer = await monkeyContract.breed(3, 4); // tokenId 13
+    const breed3answer = await monkeyContract.breed(5, 6); // tokenId 14
     //console.log('breed1answer:', breed1answer);
     //console.log('breed2answer:', breed2answer);
     //console.log('breed3answer:', breed3answer);
@@ -111,6 +111,14 @@ describe("Monkey Contract, testing", () => {
     const NFTwTokenID12 = await monkeyContract.getMonkeyDetails(12);
     let result12 = ethers.utils.formatUnits(NFTwTokenID12.genes, 0);
     console.log('NFTwTokenID12 genes:', result12);
+
+    const NFTwTokenID13 = await monkeyContract.getMonkeyDetails(13);
+    let result13 = ethers.utils.formatUnits(NFTwTokenID13.genes, 0);
+    console.log('NFTwTokenID13 genes:', result13);
+
+    const NFTwTokenID14 = await monkeyContract.getMonkeyDetails(14);
+    let result14 = ethers.utils.formatUnits(NFTwTokenID14.genes, 0);
+    console.log('NFTwTokenID14 genes:', result14);
 
     /*
     const NFTwTokenID13 = monkeyContract.getMonkeyDetails(13);
