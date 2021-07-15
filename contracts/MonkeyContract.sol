@@ -153,7 +153,7 @@ contract MonkeyContract is ERC721, Ownable, ReentrancyGuard, Pausable {
     function _mixDna (uint256 _parent1genes, uint256 _parent2genes) internal view returns (uint256) {
         uint256[8] memory _geneArray;
         uint8 _random = uint8(_getRandom());
-        uint256 index = 7;
+        uint256 countdown = 7;
 
          // xxxx
         console.log("_parent1genes: %s , _parent2genes: %s , _random: %s ", _parent1genes, _parent2genes, _random);
@@ -162,15 +162,15 @@ contract MonkeyContract is ERC721, Ownable, ReentrancyGuard, Pausable {
         for (uint256 i = 1; i <= 128; i = i * 2) {
         // Then add 2 last digits from the dna to the new dna
         if (_random & i != 0) {
-            _geneArray[index] = uint8(_parent1genes % 100);
+            _geneArray[countdown] = uint8(_parent1genes % 100);
         } else {
-            _geneArray[index] = uint8(_parent2genes % 100);
+            _geneArray[countdown] = uint8(_parent2genes % 100);
         }
         //each loop, take off the last 2 digits from the genes number string
         _parent1genes = _parent1genes / 100;
         _parent2genes = _parent2genes / 100;
 
-        index = index -1;
+        countdown = countdown.sub(1);
         }
 
         uint256 pseudoRandomAdv = 200; //uint256(keccak256(abi.encodePacked(uint256(_random), totalSupply, allMonkeysArray[0].genes))); 
