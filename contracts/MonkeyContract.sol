@@ -155,11 +155,11 @@ contract MonkeyContract is ERC721, Ownable, ReentrancyGuard, Pausable {
         uint8 _random = uint8(_getRandom());
         uint256 countdown = 7;
 
-         // xxxx
-        console.log("_parent1genes: %s , _parent2genes: %s , _random: %s ", _parent1genes, _parent2genes, _random);
+        //xxxx
+        //console.log("_parent1genes: %s , _parent2genes: %s , _random: %s ", _parent1genes, _parent2genes, _random);
 
         // Bitshift: move to next binary bit
-        for (uint256 i = 1; i <= 128; i = i * 2) {
+        for (uint256 i = 1; i <= 64; i = i * 2) {
         // Then add 2 last digits from the dna to the new dna
         if (_random & i != 0) {
             _geneArray[countdown] = uint8(_parent1genes % 100);
@@ -173,45 +173,45 @@ contract MonkeyContract is ERC721, Ownable, ReentrancyGuard, Pausable {
         countdown = countdown.sub(1);
         }
 
-        uint256 pseudoRandomAdv = 200; //uint256(keccak256(abi.encodePacked(uint256(_random), totalSupply, allMonkeysArray[0].genes))); 
+        uint256 pseudoRandomAdv = uint256(keccak256(abi.encodePacked(uint256(_random), totalSupply, allMonkeysArray[0].genes))); 
         
-        // xxxx
-        console.log("pseudoRandomAdv: %s ", pseudoRandomAdv);
+        //xxxx
+        //console.log("pseudoRandomAdv: %s ", pseudoRandomAdv);
          
 
         // makes this number a 2 digit number between 10-98
         pseudoRandomAdv = (pseudoRandomAdv % 89) + 10;
 
-         // xxxx
-        console.log("pseudoRandomAdv after shortening: %s ", pseudoRandomAdv);
+        //xxxx
+        //console.log("pseudoRandomAdv after shortening: %s ", pseudoRandomAdv);
 
         // setting first 2 digits in DNA string to random numbers
         _geneArray[0] = pseudoRandomAdv;
 
         uint256 newGeneSequence;
 
-        // xxxx
-        console.log("newGeneSequence at beginning: %s ", newGeneSequence);
+        //xxxx
+        //console.log("newGeneSequence at beginning: %s ", newGeneSequence);
         
         // puts in last positioned array entry (2 digits) as first numbers, then adds 00, then adds again,
         // therefore reversing the backwards information in the array again to correct order 
         for (uint256 j = 0; j < 8; j++) {
             newGeneSequence = newGeneSequence + _geneArray[j];
 
-            // xxxx
-            console.log("newGeneSequence being modified: %s ", newGeneSequence);
+            //xxxx
+            //console.log("newGeneSequence being modified: %s ", newGeneSequence);
 
             // will stop adding zeros after last repetition
             if (j != 7)  {
                 newGeneSequence = newGeneSequence * 100;
 
-                // xxxx
-                console.log("newGeneSequence inner loop: %s ", newGeneSequence);
+                //xxxx
+                //console.log("newGeneSequence inner loop: %s ", newGeneSequence);
             }                
         }
 
-        // xxxx
-        console.log("newGeneSequence at end: %s ", newGeneSequence); 
+        //xxxx
+        //console.log("newGeneSequence at end: %s ", newGeneSequence); 
 
         return newGeneSequence;      
     }
