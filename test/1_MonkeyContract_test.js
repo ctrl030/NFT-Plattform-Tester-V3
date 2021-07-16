@@ -84,12 +84,12 @@ describe("Monkey Contract, testing", () => {
     for (let i = 0; i < _totalSupply; i++) {
       let _monkeyMapping = await monkeyContract.allMonkeysArray(i);
       // skip monkey created by constructor
-      if(i > 0){
+      //if(i > 0){
 
       // verify monkey genes are the same from our genes0 array 
       // _monkeyMapping[3] shows genes attribute inside the returning CryptoMonkey object     
       expect(_monkeyMapping[3]).to.equal(genes0[i]);
-      }
+      //}
     } 
 
     // GEN0_Limit reached, next creation should fail
@@ -105,8 +105,8 @@ describe("Monkey Contract, testing", () => {
     const breed2answer = await monkeyContract.breed(3, 4); // tokenId 13
     const breed3answer = await monkeyContract.breed(5, 6); // tokenId 14
     
-    let result1234 = ethers.utils.formatUnits(breed1answer.r, 0);
-    console.log('result1234:', result1234);
+    //let result1234 = ethers.utils.formatUnits(breed1answer.r, 0);
+    //console.log('result1234:', result1234);
     //console.log('breed2answer:', breed2answer);
     //console.log('breed3answer:', breed3answer);
 
@@ -138,7 +138,7 @@ describe("Monkey Contract, testing", () => {
     expect(await monkeyContract.totalSupply()).to.equal(15);
   });
 
-  it("Test 4.skip: Checking tokenId ", async () =>{
+  it("Test 4: Checking tokenId ", async () =>{
     let _monkeyId = await monkeyContract.findMonkeyIdsOfAddress(accounts[0].address);
     for(i in _monkeyId){
       let _result = ethers.utils.formatUnits(_monkeyId[i], 0);
@@ -146,7 +146,7 @@ describe("Monkey Contract, testing", () => {
     }    
   });
 
-  it.skip("Test 5: TRANSFER 2 gen0 monkeys from account[0] to account[1]", async () => {    
+  it("Test 5: TRANSFER 2 gen0 monkeys from account[0] to account[1]", async () => {    
 
     const _totalSupply = await monkeyContract.totalSupply();
     //console.log(`total#[${_totalSupply}]`)
