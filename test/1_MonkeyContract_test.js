@@ -193,20 +193,19 @@ describe("Monkey Contract, testing", () => {
     await  monkeyContract.setApprovalForAll(accounts[1].address, false);
     expect(await monkeyContract.isApprovedForAll(accounts[0].address, accounts[1].address)).to.equal(false);
 
-    // REVERT
-    // REVERT: create a gen 0 monkey from account[1]    
-    await expect(await monkeyContract.connect(accounts[1]).transferFrom(accounts[0].address, accounts[2].address, 4)).to.be.revertedWith(
+    // REVERT: without operator status, accounts[1] tries to send NFT with Token ID 4 from accounts[0] to accounts[2]    
+    await expect(monkeyContract.connect(accounts[1]).transferFrom(accounts[0].address, accounts[2].address, 4)).to.be.revertedWith(
       "ERC721: transfer caller is not owner nor approved"
     );
 
-    // Giving operator status 
+    // Giving operator status again
 
     await  monkeyContract.setApprovalForAll(accounts[1].address, true);
     expect(await monkeyContract.isApprovedForAll(accounts[0].address, accounts[1].address)).to.equal(true);
     
-    // Execute something as operator
+    // AS operator, accounts[1] sends NFT with Token ID 4 from accounts[0] to accounts[2]
+    await monkeyContract.connect(accounts[1]).transferFrom(accounts[0].address, accounts[2].address, 4);
 
-   
    
   });
 
