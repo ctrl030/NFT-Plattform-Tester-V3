@@ -178,68 +178,39 @@ describe("Monkey Contract, testing", () => {
     );
     
     
-  });
-
-  /*  
-
-  describe('Testing main contract: NFT creation and transfers', () => {      
+  }); 
 
   
-  it('Test 13: accounts[0] should give accounts[1] operator status', async() => {  
+  it('Test 6: accounts[0] should give accounts[1] operator status', async() => {  
     
     // Giving operator status 
-    await monkeyContractHHInstance.setApprovalForAll(accounts[1], true, {from: accounts[0]});
 
-    const operatorGivenApprovalTesting = await monkeyContractHHInstance.isApprovedForAll(accounts[0], accounts[1]);
-     
-    assert.equal(operatorGivenApprovalTesting, true);
-    assertionCounter++;
+    await  monkeyContract.setApprovalForAll(accounts[1].address, true);
+    expect(await monkeyContract.isApprovedForAll(accounts[0].address, accounts[1].address)).to.equal(true);
+
+    // Taking operator status 
+
+    await  monkeyContract.setApprovalForAll(accounts[1].address, false);
+    expect(await monkeyContract.isApprovedForAll(accounts[0].address, accounts[1].address)).to.equal(false);
+
+    // REVERT
+    // REVERT: create a gen 0 monkey from account[1]    
+    await expect(await monkeyContract.connect(accounts[1]).transferFrom(accounts[0].address, accounts[2].address, 4)).to.be.revertedWith(
+      "ERC721: transfer caller is not owner nor approved"
+    );
+
+    // Giving operator status 
+
+    await  monkeyContract.setApprovalForAll(accounts[1].address, true);
+    expect(await monkeyContract.isApprovedForAll(accounts[0].address, accounts[1].address)).to.equal(true);
+    
+    // Execute something as operator
+
+   
    
   });
 
-  it('Test 14: accounts[0] should take operator status away from accounts[1]', async() => {  
-    await monkeyContractHHInstance.setApprovalForAll(accounts[1], false, {from: accounts[0]});
-    
-    const operatorTakenApprovalTesting = await monkeyContractHHInstance.isApprovedForAll(accounts[0], accounts[1]);
-         
-    // console.log('operator status for accounts[1] is:', operatorTakenApprovalTesting);    
-    
-    assert.equal(operatorTakenApprovalTesting, false);
-    assertionCounter++;
-  });
-
-  it('Test 15: accounts[0] should give accounts[1] operator status again', async() => {  
-
-    // Giving operator status 
-    await monkeyContractHHInstance.setApprovalForAll(accounts[1], true, {from: accounts[0]});
-
-    const operatorGivenApprovalTesting = await monkeyContractHHInstance.isApprovedForAll(accounts[0], accounts[1]);
-      
-    assert.equal(operatorGivenApprovalTesting, true);
-    assertionCounter++;     
-  });
-
-  it('Test 15A: accounts[0] should use safeTransferFrom with sending data to move Token ID 1 from itself to accounts[2]', async() => {  
-    
-    await monkeyContractHHInstance.safeTransferFrom(accounts[0], accounts[2], 1, '0xa1234');      
-
-    const testingMonkey = await monkeyContractHHInstance.getMonkeyDetails(1);
-    
-    assert.equal(testingMonkey.owner, accounts[2]);
-    assertionCounter++;      
-
-    await assertPosIntegrAllNFTs();
-
-    const account0ArrayToAssert = [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 ];
-    await assertAllFourTrackersCorrect (accounts[0], 11, account0ArrayToAssert);
-
-    const account2ArrayToAssert = [1];
-    await assertAllFourTrackersCorrect (accounts[2], 1, account2ArrayToAssert);
-    
-  });
-
-
-  it('Test 16: as operator, accounts[1] should use transferFrom to move 4 NFTs with Token IDs 2-5 from accounts[0] to accounts[2]', async() => {  
+  it.skip('Test 7: as operator, accounts[1] should use transferFrom to move 4 NFTs with Token IDs 2-5 from accounts[0] to accounts[2]', async() => {  
     
     for (let index = 2; index <= 5; index++) {
       await monkeyContractHHInstance.transferFrom(accounts[0], accounts[2], `${index}`, { 
@@ -262,6 +233,29 @@ describe("Monkey Contract, testing", () => {
     await assertAllFourTrackersCorrect (accounts[2], 5,  account2ArrayToAssert);
     
   });
+
+/* 
+  it('Test 15A: accounts[0] should use safeTransferFrom with sending data to move Token ID 1 from itself to accounts[2]', async() => {  
+    
+    await monkeyContractHHInstance.safeTransferFrom(accounts[0], accounts[2], 1, '0xa1234');      
+
+    const testingMonkey = await monkeyContractHHInstance.getMonkeyDetails(1);
+    
+    assert.equal(testingMonkey.owner, accounts[2]);
+    assertionCounter++;      
+
+    await assertPosIntegrAllNFTs();
+
+    const account0ArrayToAssert = [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 ];
+    await assertAllFourTrackersCorrect (accounts[0], 11, account0ArrayToAssert);
+
+    const account2ArrayToAssert = [1];
+    await assertAllFourTrackersCorrect (accounts[2], 1, account2ArrayToAssert);
+    
+  });
+
+
+  
 
   it('Test 16A: as operator, accounts[1] should use transferFrom to take 7 NFTs with Token IDs 6-12 from accounts[0]', async() => {  
     

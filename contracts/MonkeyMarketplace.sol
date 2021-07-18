@@ -37,7 +37,7 @@ contract MonkeyMarketplace is Ownable, ReentrancyGuard, Pausable {
 
   constructor (address _constructorMonkeyContractAddress) {
     _ERC721 = IMonkeyContract(_constructorMonkeyContractAddress);
-    require(_ERC721.getMonkeyContractAddress() == _constructorMonkeyContractAddress, "CONSTRUCTOR::Monkey contract address must be the same.");
+    require(_ERC721.getMonkeyContractAddress() == _constructorMonkeyContractAddress, "CONSTRUCTOR: Monkey contract address must be the same.");
   }
  
   /**

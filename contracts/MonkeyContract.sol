@@ -280,7 +280,7 @@ contract MonkeyContract is ERC721, Ownable, ReentrancyGuard, Pausable {
         emit MonkeyCreated(_owner, newMonkeyId, _parent1Id, _parent2Id, _genes);
 
         // xxxx
-        console.log("Token ID %s has genes: %s", newMonkeyId, _genes);
+        //console.log("Token ID %s has genes: %s", newMonkeyId, _genes);
 
         // tokenId is returned
         return newMonkeyId;
