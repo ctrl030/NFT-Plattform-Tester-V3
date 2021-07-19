@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
+// under construction, needs to implement ERC721 and connect to main correctly
+
 import "./IMonkeyContract.sol";
 // preparing for some functions to be restricted 
 import "@openzeppelin/contracts/access/Ownable.sol";
